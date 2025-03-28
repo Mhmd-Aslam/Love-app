@@ -61,7 +61,7 @@ class GrowingButton(RoundedButton):
 
 class LoveApp(App):
     message = StringProperty("Will you go on a date with me? ❤️")
-    yes_scale = NumericProperty(1.0)  # Scale factor for Yes button
+    original_yes_size = (0.43, 0.6)  # Store original size
     
     def build(self):
         # Romantic background
@@ -102,7 +102,7 @@ class LoveApp(App):
             font_size="24sp",
             button_color=(0.9, 0.3, 0.5, 1),  # Pink color
             color=(1, 1, 1, 1),  # White text
-            size_hint=(0.43, 0.6),
+            size_hint=self.original_yes_size,
             pos_hint={'center_x': 0.27, 'center_y': 0.5},
             bold=True)
         self.yes_button.bind(on_press=self.say_yes)
@@ -153,17 +153,20 @@ class LoveApp(App):
         self.show_fullscreen_love()
     
     def on_no_press(self, instance):
-        # Grow Yes button exponentially
-        self.yes_scale *= 1.2  # 20% growth per click
+        # Calculate 20% of original size
+        growth_amount = (self.original_yes_size[0] * 0.2, self.original_yes_size[1] * 0.2)
+        
+        # Calculate new size (capped at 100%)
+        new_width = min(1.0, self.yes_button.size_hint[0] + growth_amount[0])
+        new_height = min(1.0, self.yes_button.size_hint[1] + growth_amount[1])
         
         # Animate the expansion
         anim = Animation(
-            size_hint=(self.yes_scale, self.yes_scale),
-            pos_hint={'center_x': 0.5, 'center_y': 0.5},
+            size_hint=(new_width, new_height),
+            pos_hint={'center_x': 0.27, 'center_y': 0.5},
             duration=0.4,
             t='in_out_quad'
         )
-        anim.bind(on_complete=self.check_fullscreen)
         anim.start(self.yes_button)
         
         # Shrink No button
@@ -177,17 +180,13 @@ class LoveApp(App):
         # Change No button text if visible
         if self.no_button.size_hint[0] > 0.1:
             playful_texts = [
-                "No 😜", "Try again", "Not today", 
+                "No ", "Try again", "Not today", 
                 "Maybe?", "Click Yes!", "Nope!",
                 "I'm shy", "Later?", "Can't decide",
                 "You wish!", "Not sure", "Think again"
             ]
             self.no_button.text = choice(playful_texts)
-    
-    def check_fullscreen(self, *args):
-        # If Yes button covers most of the screen through No clicks
-        if self.yes_scale > 2.5:
-            self.show_fullscreen_love()
+        
 
 if __name__ == '__main__':
     LoveApp().run()
