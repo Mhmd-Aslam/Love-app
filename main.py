@@ -62,6 +62,16 @@ class GrowingButton(RoundedButton):
 class LoveApp(App):
     message = StringProperty("Will you go on a date with me? ❤️")
     original_yes_size = (0.43, 0.6)  # Store original size
+    original_yes_pos = {'center_x': 0.27, 'center_y': 0.5}  # Store original position
+    
+    # Custom expansion factors for each edge (left, right, top, bottom)
+    # These values determine how much each edge expands relative to others
+    expand_factors = {
+        'left': 0.2,    # 30% of growth goes to left
+        'right': 0.5,   # 70% of growth goes to right
+        'top': 5,     # 50% of growth goes to top
+        'bottom': 1   # 50% of growth goes to bottom
+    }
     
     def build(self):
         # Romantic background
@@ -103,7 +113,7 @@ class LoveApp(App):
             button_color=(0.9, 0.3, 0.5, 1),  # Pink color
             color=(1, 1, 1, 1),  # White text
             size_hint=self.original_yes_size,
-            pos_hint={'center_x': 0.27, 'center_y': 0.5},
+            pos_hint=self.original_yes_pos,
             bold=True)
         self.yes_button.bind(on_press=self.say_yes)
         self.button_box.add_widget(self.yes_button)
@@ -153,17 +163,27 @@ class LoveApp(App):
         self.show_fullscreen_love()
     
     def on_no_press(self, instance):
-        # Calculate 20% of original size
+        # Calculate growth amount (20% of original size)
         growth_amount = (self.original_yes_size[0] * 0.2, self.original_yes_size[1] * 0.2)
         
         # Calculate new size (capped at 100%)
         new_width = min(1.0, self.yes_button.size_hint[0] + growth_amount[0])
         new_height = min(1.0, self.yes_button.size_hint[1] + growth_amount[1])
         
+        # Calculate new position based on expansion factors
+        width_growth = new_width - self.yes_button.size_hint[0]
+        height_growth = new_height - self.yes_button.size_hint[1]
+        
+        # Calculate new position (expanding according to factors)
+        new_pos = {
+            'center_x': self.original_yes_pos['center_x'] - (width_growth * (self.expand_factors['left'] - self.expand_factors['right'])/2),
+            'center_y': self.original_yes_pos['center_y'] + (height_growth * (self.expand_factors['top'] - self.expand_factors['bottom'])/2)
+        }
+        
         # Animate the expansion
         anim = Animation(
             size_hint=(new_width, new_height),
-            pos_hint={'center_x': 0.27, 'center_y': 0.5},
+            pos_hint=new_pos,
             duration=0.4,
             t='in_out_quad'
         )
@@ -187,6 +207,9 @@ class LoveApp(App):
             ]
             self.no_button.text = choice(playful_texts)
         
+        # Check if we should show fullscreen
+        if new_width >= 1.0 or new_height >= 1.0:
+            self.show_fullscreen_love()
 
 if __name__ == '__main__':
     LoveApp().run()
