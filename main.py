@@ -5,14 +5,43 @@ from kivy.uix.label import Label
 from kivy.uix.image import Image
 from kivy.core.window import Window
 from kivy.animation import Animation
-from kivy.properties import NumericProperty, StringProperty
+from kivy.properties import NumericProperty, StringProperty, ListProperty
+from kivy.graphics import Color, RoundedRectangle
 from random import choice
 
 # Set mobile-friendly dimensions
 Window.size = (360, 640)  # Standard mobile size
 
-class GrowingButton(Button):
-    """Button that scales its text with its size"""
+class RoundedButton(Button):
+    """Button with rounded corners and visible colors"""
+    border_radius = ListProperty([70])  # This makes it a valid Kivy property
+    
+    def __init__(self, **kwargs):
+        # Get button_color from kwargs or use default
+        self.button_color = kwargs.pop('button_color', (0.9, 0.3, 0.5, 1))
+        
+        super().__init__(**kwargs)
+        self.background_normal = ''
+        self.background_color = (0, 0, 0, 0)  # Make background transparent
+        
+        # Initial draw
+        self.draw_button()
+        
+        # Bind properties to update the button
+        self.bind(pos=self.draw_button, size=self.draw_button, border_radius=self.draw_button)
+        
+    def draw_button(self, *args):
+        self.canvas.before.clear()
+        with self.canvas.before:
+            Color(*self.button_color)
+            RoundedRectangle(
+                pos=self.pos,
+                size=self.size,
+                radius=self.border_radius
+            )
+
+class GrowingButton(RoundedButton):
+    """Button that scales its text with size and has rounded corners"""
     def __init__(self, **kwargs):
         # Get font_size from kwargs if specified
         font_size = kwargs.pop('font_size', '24sp')
@@ -69,29 +98,25 @@ class LoveApp(App):
         
         # "Yes" Button (using our custom GrowingButton)
         self.yes_button = GrowingButton(
-            text="Yes! 💖",
-            font_size="24sp",  # Pass as string
-            background_color=(0.9, 0.3, 0.5, 1),
-            color=(1, 1, 1, 1),
-            size_hint=(0.45, 0.8),
-            pos_hint={'center_x': 0.3, 'center_y': 0.5},
-            background_normal='',
-            bold=True,
-            border=(10, 10, 10, 10))
+            text="Yes!",
+            font_size="24sp",
+            button_color=(0.9, 0.3, 0.5, 1),  # Pink color
+            color=(1, 1, 1, 1),  # White text
+            size_hint=(0.43, 0.6),
+            pos_hint={'center_x': 0.27, 'center_y': 0.5},
+            bold=True)
         self.yes_button.bind(on_press=self.say_yes)
         self.button_box.add_widget(self.yes_button)
         
         # "No" Button
-        self.no_button = Button(
-            text="No 😜",
+        self.no_button = RoundedButton(
+            text="No",
             font_size="24sp",
-            background_color=(0.7, 0.5, 0.7, 1),
-            color=(1, 1, 1, 1),
-            size_hint=(0.45, 0.8),
-            pos_hint={'center_x': 0.7, 'center_y': 0.5},
-            background_normal='',
-            bold=True,
-            border=(10, 10, 10, 10))
+            button_color=(0.7, 0.5, 0.7, 1),  # Purple color
+            color=(1, 1, 1, 1),  # White text
+            size_hint=(0.43, 0.6),
+            pos_hint={'center_x': 0.73, 'center_y': 0.5},
+            bold=True)
         self.no_button.bind(on_press=self.on_no_press)
         self.button_box.add_widget(self.no_button)
         
@@ -103,21 +128,21 @@ class LoveApp(App):
     
     def show_fullscreen_love(self):
         # Create fullscreen love message
-        self.love_button = Button(
+        self.love_button = RoundedButton(
             text="I LOVE YOU! ❤️",
-            font_size=48,  # Using numeric value here
-            background_color=(1, 0.2, 0.4, 1),
-            color=(1, 1, 1, 1),
+            font_size=48,
+            button_color=(1, 0.2, 0.4, 1),  # Romantic red
+            color=(1, 1, 1, 1),  # White text
             size_hint=(1, 1),
             pos_hint={'x': 0, 'y': 0},
-            background_normal='',
             bold=True)
+        self.love_button.border_radius = [0]  # No rounding for fullscreen
         
         # Clear current layout and show fullscreen message
         self.layout.clear_widgets()
         self.layout.add_widget(self.love_button)
         
-        # Add pulse animation to fullscreen message using numeric values
+        # Add pulse animation to fullscreen message
         anim = (Animation(font_size=52, duration=0.8) + 
                Animation(font_size=48, duration=0.8))
         anim.repeat = True
@@ -135,7 +160,7 @@ class LoveApp(App):
         anim = Animation(
             size_hint=(self.yes_scale, self.yes_scale),
             pos_hint={'center_x': 0.5, 'center_y': 0.5},
-            duration=0.3,
+            duration=0.4,
             t='in_out_quad'
         )
         anim.bind(on_complete=self.check_fullscreen)
