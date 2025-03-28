@@ -15,7 +15,7 @@ class LoveApp(App):
         layout = BoxLayout(orientation='vertical', spacing=20, padding=30)
 
         # Cute heart image (auto-scaled)
-        layout.add_widget(Image(source="heart.png", size_hint=(1, 0.25)))
+        layout.add_widget(Image(source="logos/heart.png", size_hint=(1, 0.25)))
 
         # Romantic message
         self.label = Label(text="Will you go on a date with me? ❤️",
