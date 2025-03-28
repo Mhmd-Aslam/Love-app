@@ -11,6 +11,25 @@ from random import choice
 # Set mobile-friendly dimensions
 Window.size = (360, 640)  # Standard mobile size
 
+class GrowingButton(Button):
+    """Button that scales its text with its size"""
+    def __init__(self, **kwargs):
+        # Get font_size from kwargs if specified
+        font_size = kwargs.pop('font_size', '24sp')
+        if isinstance(font_size, str):
+            self.base_font_size = float(font_size[:-2])  # Remove 'sp' suffix
+        else:
+            self.base_font_size = float(font_size)
+        
+        super().__init__(**kwargs)
+        self.font_size = font_size  # Set the initial font size
+        
+    def on_size(self, instance, size):
+        # Scale font size proportionally to button size
+        scale_factor = min(size[0]/self.width, size[1]/self.height)
+        new_size = max(self.base_font_size, self.base_font_size * scale_factor * 1.5)
+        self.font_size = f"{new_size}sp"
+
 class LoveApp(App):
     message = StringProperty("Will you go on a date with me? ❤️")
     yes_scale = NumericProperty(1.0)  # Scale factor for Yes button
@@ -48,10 +67,10 @@ class LoveApp(App):
         # Button container
         self.button_box = FloatLayout(size_hint=(1, 0.3), pos_hint={'bottom': 1})
         
-        # "Yes" Button
-        self.yes_button = Button(
+        # "Yes" Button (using our custom GrowingButton)
+        self.yes_button = GrowingButton(
             text="Yes! 💖",
-            font_size="24sp",
+            font_size="24sp",  # Pass as string
             background_color=(0.9, 0.3, 0.5, 1),
             color=(1, 1, 1, 1),
             size_hint=(0.45, 0.8),
@@ -82,18 +101,31 @@ class LoveApp(App):
         
         return self.layout
     
+    def show_fullscreen_love(self):
+        # Create fullscreen love message
+        self.love_button = Button(
+            text="I LOVE YOU! ❤️",
+            font_size=48,  # Using numeric value here
+            background_color=(1, 0.2, 0.4, 1),
+            color=(1, 1, 1, 1),
+            size_hint=(1, 1),
+            pos_hint={'x': 0, 'y': 0},
+            background_normal='',
+            bold=True)
+        
+        # Clear current layout and show fullscreen message
+        self.layout.clear_widgets()
+        self.layout.add_widget(self.love_button)
+        
+        # Add pulse animation to fullscreen message using numeric values
+        anim = (Animation(font_size=52, duration=0.8) + 
+               Animation(font_size=48, duration=0.8))
+        anim.repeat = True
+        anim.start(self.love_button)
+    
     def say_yes(self, instance):
-        # Celebration message
-        self.message = "Yay! I'm so happy! 🥰💕"
-        
-        # Change button colors
-        self.yes_button.background_color = (0.2, 0.8, 0.3, 1)  # Green
-        self.no_button.background_color = (0.9, 0.2, 0.2, 1)   # Red
-        
-        # Heart animation
-        anim = Animation(size_hint=(0.45, 0.45), duration=0.2) + \
-               Animation(size_hint=(0.4, 0.4), duration=0.2)
-        anim.start(self.heart)
+        # Immediately show fullscreen love message
+        self.show_fullscreen_love()
     
     def on_no_press(self, instance):
         # Grow Yes button exponentially
@@ -128,20 +160,9 @@ class LoveApp(App):
             self.no_button.text = choice(playful_texts)
     
     def check_fullscreen(self, *args):
-        # If Yes button covers most of the screen
+        # If Yes button covers most of the screen through No clicks
         if self.yes_scale > 2.5:
-            # Move to top layer and cover everything
-            self.button_box.remove_widget(self.yes_button)
-            self.layout.remove_widget(self.content)
-            self.layout.remove_widget(self.button_box)
-            self.layout.add_widget(self.yes_button)
-            
-            # Final fullscreen appearance
-            self.yes_button.size_hint = (1, 1)
-            self.yes_button.pos_hint = {'x': 0, 'y': 0}
-            self.yes_button.text = "I LOVE YOU! ❤️"
-            self.yes_button.font_size = "32sp"
-            self.yes_button.background_color = (1, 0.2, 0.4, 1)  # Romantic red
+            self.show_fullscreen_love()
 
 if __name__ == '__main__':
     LoveApp().run()
