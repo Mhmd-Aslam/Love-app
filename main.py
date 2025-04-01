@@ -206,7 +206,7 @@ class LoveApp(App):
             # Create animation to move right and shrink
             anim = Animation(
                 size_hint_x=max(0.1, self.no_button.size_hint[0] - 0.05),
-                pos_hint={'center_x': min(1.5, current_no_pos + 0.1), 'center_y': 0.5},
+                pos_hint={'center_x': min(1.5, current_no_pos + 0.065), 'center_y': 0.5},
                 duration=0.3
             )
             anim.start(self.no_button)
