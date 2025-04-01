@@ -61,7 +61,7 @@ class RoundedButton(Button):
         self.font_size = new_size
 
 class LoveApp(App):
-    message = StringProperty("Will you go on a date with me? ❤️")
+    message = StringProperty("Will you go on a date with me? ")
     original_yes_size = (0.43, 0.6)  # Store original size
     original_yes_pos = {'center_x': 0.27, 'center_y': 0.5}  # Store original position
     no_button_clicks = 0  # Track number of "No" button clicks
@@ -142,7 +142,7 @@ class LoveApp(App):
     def show_fullscreen_love(self):
         # Create fullscreen love message
         self.love_button = RoundedButton(
-            text="I LOVE YOU! ❤️",
+            text="I LOVE YOU! ",
             font_size=48,
             button_color=(1, 0.2, 0.4, 1),
             color=(1, 1, 1, 1),
