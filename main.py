@@ -173,9 +173,9 @@ class LoveApp(App):
         # Calculate growth amount (20% of current size for proportional growth)
         growth_amount = (current_size[0] * 0.2, current_size[1] * 0.2)
         
-        # Calculate new size (capped at 100%)
-        new_width = min(1.0, current_size[0] + growth_amount[0])
-        new_height = min(1.0, current_size[1] + growth_amount[1])
+        # Calculate new size (no upper limit now)
+        new_width = current_size[0] + growth_amount[0]
+        new_height = current_size[1] + growth_amount[1]
         
         # Calculate new position based on expansion factors
         width_growth = new_width - current_size[0]
@@ -196,7 +196,7 @@ class LoveApp(App):
         )
         anim.start(self.yes_button)
         
-        # Shrink No button
+        # Shrink No button (but keep it visible)
         anim = Animation(
             size_hint=(max(0.1, self.no_button.size_hint[0] - 0.1), 
                       max(0.1, self.no_button.size_hint[1] - 0.1)),
@@ -213,9 +213,7 @@ class LoveApp(App):
         ]
         self.no_button.text = choice(playful_texts)
         
-        # Check if we should show fullscreen
-        """if new_width >= 1.0 or new_height >= 1.0:
-            self.show_fullscreen_love()"""
+        
 
 if __name__ == '__main__':
     LoveApp().run()
