@@ -8,6 +8,7 @@ from kivy.animation import Animation
 from kivy.properties import StringProperty, ListProperty, NumericProperty
 from kivy.graphics import Color, RoundedRectangle
 from random import choice
+from kivy.clock import Clock
 
 # Set mobile-friendly dimensions
 Window.size = (360, 640)  # Standard mobile size
@@ -63,10 +64,11 @@ class LoveApp(App):
     message = StringProperty("Will you go on a date with me? ❤️")
     original_yes_size = (0.43, 0.6)  # Store original size
     original_yes_pos = {'center_x': 0.27, 'center_y': 0.5}  # Store original position
+    no_button_clicks = 0  # Track number of "No" button clicks
     
     # Custom expansion factors for each edge (left, right, top, bottom)
     expand_factors = {
-        'left': 0.2,    # 20% of growth goes to left
+        'left': 0.1,    # 10% of growth goes to left
         'right': 0.2,   # 20% of growth goes to right
         'top': 12.5,    # 62.5% of growth goes to top
         'bottom': 12    # 37.5% of growth goes to bottom
@@ -92,17 +94,17 @@ class LoveApp(App):
         # Romantic message - adjusted to fit screen
         self.label = Label(
             text=self.message,
-            font_size="24sp",  # Reduced from 28sp to better fit
+            font_size="24sp",
             bold=True,
             color=(0.8, 0.2, 0.4, 1),
             outline_color=(1, 1, 1, 0.8),
             outline_width=2,
             size_hint=(0.9, None),
-            height=Window.height * 0.15,  # Fixed height
-            pos_hint={'center_x': 0.5, 'top': 0.55},  # Adjusted position
+            height=Window.height * 0.15,
+            pos_hint={'center_x': 0.5, 'top': 0.55},
             halign='center',
             valign='middle',
-            text_size=(Window.width * 0.85, None))  # Text wrapping
+            text_size=(Window.width * 0.85, None))
         self.content.add_widget(self.label)
         
         # Button container
@@ -112,8 +114,8 @@ class LoveApp(App):
         self.yes_button = RoundedButton(
             text="Yes!",
             font_size="24sp",
-            button_color=(0.9, 0.3, 0.5, 1),  # Pink color
-            color=(1, 1, 1, 1),  # White text
+            button_color=(0.9, 0.3, 0.5, 1),
+            color=(1, 1, 1, 1),
             size_hint=self.original_yes_size,
             pos_hint=self.original_yes_pos,
             bold=True)
@@ -124,15 +126,14 @@ class LoveApp(App):
         self.no_button = RoundedButton(
             text="No",
             font_size="24sp",
-            button_color=(0.7, 0.5, 0.7, 1),  # Purple color
-            color=(1, 1, 1, 1),  # White text
+            button_color=(0.7, 0.5, 0.7, 1),
+            color=(1, 1, 1, 1),
             size_hint=(0.43, 0.6),
             pos_hint={'center_x': 0.73, 'center_y': 0.5},
             bold=True)
         self.no_button.bind(on_press=self.on_no_press)
         self.button_box.add_widget(self.no_button)
         
-        # Add all components to main layout
         self.layout.add_widget(self.content)
         self.layout.add_widget(self.button_box)
         
@@ -143,28 +144,27 @@ class LoveApp(App):
         self.love_button = RoundedButton(
             text="I LOVE YOU! ❤️",
             font_size=48,
-            button_color=(1, 0.2, 0.4, 1),  # Romantic red
-            color=(1, 1, 1, 1),  # White text
+            button_color=(1, 0.2, 0.4, 1),
+            color=(1, 1, 1, 1),
             size_hint=(1, 1),
             pos_hint={'x': 0, 'y': 0},
             bold=True)
-        self.love_button.border_radius = [0]  # No rounding for fullscreen
+        self.love_button.border_radius = [0]
         
-        # Clear current layout and show fullscreen message
         self.layout.clear_widgets()
         self.layout.add_widget(self.love_button)
         
-        # Add pulse animation to fullscreen message
         anim = (Animation(font_size=52, duration=0.8) + 
                Animation(font_size=48, duration=0.8))
         anim.repeat = True
         anim.start(self.love_button)
     
     def say_yes(self, instance):
-        # Immediately show fullscreen love message
         self.show_fullscreen_love()
     
     def on_no_press(self, instance):
+        self.no_button_clicks += 1
+        
         # Use current size and position as the base for expansion
         current_size = self.yes_button.size_hint
         current_pos = {
@@ -198,13 +198,30 @@ class LoveApp(App):
         )
         anim.start(self.yes_button)
         
-        # Shrink No button (but keep it visible)
-        anim = Animation(
-            size_hint=(max(0.1, self.no_button.size_hint[0] - 0.1), 
-                      max(0.1, self.no_button.size_hint[1] - 0.1)),
-            duration=0.3
-        )
-        anim.start(self.no_button)
+        # After 7th click, start moving "No" button to the right
+        if self.no_button_clicks >= 7:
+            # Get current position
+            current_no_pos = self.no_button.pos_hint['center_x']
+            
+            # Create animation to move right and shrink
+            anim = Animation(
+                size_hint_x=max(0.1, self.no_button.size_hint[0] - 0.05),
+                pos_hint={'center_x': min(1.5, current_no_pos + 0.1), 'center_y': 0.5},
+                duration=0.3
+            )
+            anim.start(self.no_button)
+            
+            # If button goes off screen, remove it
+            if current_no_pos >= 1.3:
+                Clock.schedule_once(lambda dt: self.button_box.remove_widget(self.no_button), 0.3)
+        else:
+            # Normal shrinking behavior for first 6 clicks
+            anim = Animation(
+                size_hint=(max(0.1, self.no_button.size_hint[0] - 0.1), 
+                          max(0.1, self.no_button.size_hint[1] - 0.1)),
+                duration=0.3
+            )
+            anim.start(self.no_button)
         
         # Change No button text
         playful_texts = [
@@ -214,6 +231,6 @@ class LoveApp(App):
             "You wish!", "Not sure", "Think again"
         ]
         self.no_button.text = choice(playful_texts)
-        
+
 if __name__ == '__main__':
     LoveApp().run()
