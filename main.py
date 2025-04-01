@@ -89,17 +89,20 @@ class LoveApp(App):
             pos_hint={'center_x': 0.5, 'center_y': 0.7})
         self.content.add_widget(self.heart)
         
-        # Romantic message
+        # Romantic message - adjusted to fit screen
         self.label = Label(
             text=self.message,
-            font_size="28sp",
+            font_size="24sp",  # Reduced from 28sp to better fit
             bold=True,
             color=(0.8, 0.2, 0.4, 1),
             outline_color=(1, 1, 1, 0.8),
             outline_width=2,
             size_hint=(0.9, None),
-            pos_hint={'center_x': 0.5, 'top': 0.5},
-            halign='center')
+            height=Window.height * 0.15,  # Fixed height
+            pos_hint={'center_x': 0.5, 'top': 0.55},  # Adjusted position
+            halign='center',
+            valign='middle',
+            text_size=(Window.width * 0.85, None))  # Text wrapping
         self.content.add_widget(self.label)
         
         # Button container
