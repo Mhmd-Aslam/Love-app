@@ -5,7 +5,7 @@ from kivy.uix.label import Label
 from kivy.uix.image import Image
 from kivy.core.window import Window
 from kivy.animation import Animation
-from kivy.properties import StringProperty, ListProperty
+from kivy.properties import StringProperty, ListProperty, NumericProperty
 from kivy.graphics import Color, RoundedRectangle
 from random import choice
 
@@ -14,21 +14,34 @@ Window.size = (360, 640)  # Standard mobile size
 
 class RoundedButton(Button):
     """Button with rounded corners and visible colors"""
-    border_radius = ListProperty([70])  # This makes it a valid Kivy property
+    border_radius = ListProperty([70])
+    base_font_size = NumericProperty(24)  # Base font size in pixels
     
     def __init__(self, **kwargs):
         # Get button_color from kwargs or use default
         self.button_color = kwargs.pop('button_color', (0.9, 0.3, 0.5, 1))
         
+        # Get font_size if specified (either as '24sp' or 24)
+        font_size = kwargs.pop('font_size', '24sp')
+        if isinstance(font_size, str):
+            self.base_font_size = float(font_size[:-2])  # Remove 'sp' suffix
+        else:
+            self.base_font_size = float(font_size)
+        
         super().__init__(**kwargs)
         self.background_normal = ''
         self.background_color = (0, 0, 0, 0)  # Make background transparent
+        self.font_size = self.base_font_size  # Set initial font size
         
         # Initial draw
         self.draw_button()
         
         # Bind properties to update the button
-        self.bind(pos=self.draw_button, size=self.draw_button, border_radius=self.draw_button)
+        self.bind(
+            pos=self.draw_button, 
+            size=self.draw_button, 
+            border_radius=self.draw_button
+        )
         
     def draw_button(self, *args):
         self.canvas.before.clear()
@@ -39,25 +52,12 @@ class RoundedButton(Button):
                 size=self.size,
                 radius=self.border_radius
             )
-
-class GrowingButton(RoundedButton):
-    """Button that scales its text with size and has rounded corners"""
-    def __init__(self, **kwargs):
-        # Get font_size from kwargs if specified
-        font_size = kwargs.pop('font_size', '24sp')
-        if isinstance(font_size, str):
-            self.base_font_size = float(font_size[:-2])  # Remove 'sp' suffix
-        else:
-            self.base_font_size = float(font_size)
-        
-        super().__init__(**kwargs)
-        self.font_size = font_size  # Set the initial font size
-        
+    
     def on_size(self, instance, size):
-        # Scale font size proportionally to button size
-        scale_factor = min(size[0]/self.width, size[1]/self.height)
-        new_size = max(self.base_font_size, self.base_font_size * scale_factor * 1.5)
-        self.font_size = f"{new_size}sp"
+        # Calculate proportional font size based on button height
+        scale_factor = size[1] / (Window.height * 0.3 * 0.3)  # Original button height
+        new_size = max(12, self.base_font_size * scale_factor)  # Minimum 12px
+        self.font_size = new_size
 
 class LoveApp(App):
     message = StringProperty("Will you go on a date with me? ❤️")
@@ -65,12 +65,11 @@ class LoveApp(App):
     original_yes_pos = {'center_x': 0.27, 'center_y': 0.5}  # Store original position
     
     # Custom expansion factors for each edge (left, right, top, bottom)
-    # These values determine how much each edge expands relative to others
     expand_factors = {
         'left': 0.2,    # 20% of growth goes to left
-        'right': 0.2,   # 50% of growth goes to right
-        'top': 12.5,       # 50% of growth goes to top
-        'bottom': 12     # 10% of growth goes to bottom
+        'right': 0.2,   # 20% of growth goes to right
+        'top': 12.5,    # 62.5% of growth goes to top
+        'bottom': 12    # 37.5% of growth goes to bottom
     }
     
     def build(self):
@@ -106,8 +105,8 @@ class LoveApp(App):
         # Button container
         self.button_box = FloatLayout(size_hint=(1, 0.3), pos_hint={'bottom': 1})
         
-        # "Yes" Button (using our custom GrowingButton)
-        self.yes_button = GrowingButton(
+        # "Yes" Button
+        self.yes_button = RoundedButton(
             text="Yes!",
             font_size="24sp",
             button_color=(0.9, 0.3, 0.5, 1),  # Pink color
@@ -170,10 +169,10 @@ class LoveApp(App):
             'center_y': self.yes_button.pos_hint['center_y']
         }
         
-        # Calculate growth amount (20% of current size for proportional growth)
+        # Calculate growth amount (20% of current size)
         growth_amount = (current_size[0] * 0.2, current_size[1] * 0.2)
         
-        # Calculate new size (no upper limit now)
+        # Calculate new size (no upper limit)
         new_width = current_size[0] + growth_amount[0]
         new_height = current_size[1] + growth_amount[1]
         
@@ -213,7 +212,5 @@ class LoveApp(App):
         ]
         self.no_button.text = choice(playful_texts)
         
-        
-
 if __name__ == '__main__':
     LoveApp().run()
