@@ -5,7 +5,7 @@ from kivy.uix.label import Label
 from kivy.uix.image import Image
 from kivy.core.window import Window
 from kivy.animation import Animation
-from kivy.properties import NumericProperty, StringProperty, ListProperty
+from kivy.properties import StringProperty, ListProperty
 from kivy.graphics import Color, RoundedRectangle
 from random import choice
 
@@ -67,10 +67,10 @@ class LoveApp(App):
     # Custom expansion factors for each edge (left, right, top, bottom)
     # These values determine how much each edge expands relative to others
     expand_factors = {
-        'left': 0.2,    # 30% of growth goes to left
-        'right': 0.5,   # 70% of growth goes to right
-        'top': 5,     # 50% of growth goes to top
-        'bottom': 1   # 50% of growth goes to bottom
+        'left': 0.2,    # 20% of growth goes to left
+        'right': 0.5,   # 50% of growth goes to right
+        'top': 5,       # 50% of growth goes to top
+        'bottom': 1     # 10% of growth goes to bottom
     }
     
     def build(self):
@@ -163,21 +163,28 @@ class LoveApp(App):
         self.show_fullscreen_love()
     
     def on_no_press(self, instance):
-        # Calculate growth amount (20% of original size)
-        growth_amount = (self.original_yes_size[0] * 0.2, self.original_yes_size[1] * 0.2)
+        # Use current size and position as the base for expansion
+        current_size = self.yes_button.size_hint
+        current_pos = {
+            'center_x': self.yes_button.pos_hint['center_x'],
+            'center_y': self.yes_button.pos_hint['center_y']
+        }
+        
+        # Calculate growth amount (20% of current size for proportional growth)
+        growth_amount = (current_size[0] * 0.2, current_size[1] * 0.2)
         
         # Calculate new size (capped at 100%)
-        new_width = min(1.0, self.yes_button.size_hint[0] + growth_amount[0])
-        new_height = min(1.0, self.yes_button.size_hint[1] + growth_amount[1])
+        new_width = min(1.0, current_size[0] + growth_amount[0])
+        new_height = min(1.0, current_size[1] + growth_amount[1])
         
         # Calculate new position based on expansion factors
-        width_growth = new_width - self.yes_button.size_hint[0]
-        height_growth = new_height - self.yes_button.size_hint[1]
+        width_growth = new_width - current_size[0]
+        height_growth = new_height - current_size[1]
         
         # Calculate new position (expanding according to factors)
         new_pos = {
-            'center_x': self.original_yes_pos['center_x'] - (width_growth * (self.expand_factors['left'] - self.expand_factors['right'])/2),
-            'center_y': self.original_yes_pos['center_y'] + (height_growth * (self.expand_factors['top'] - self.expand_factors['bottom'])/2)
+            'center_x': current_pos['center_x'] - (width_growth * (self.expand_factors['left'] - self.expand_factors['right'])/2),
+            'center_y': current_pos['center_y'] + (height_growth * (self.expand_factors['top'] - self.expand_factors['bottom'])/2)
         }
         
         # Animate the expansion
@@ -191,25 +198,24 @@ class LoveApp(App):
         
         # Shrink No button
         anim = Animation(
-            size_hint=(max(0, self.no_button.size_hint[0] - 0.1), 
-                      max(0, self.no_button.size_hint[1] - 0.1)),
+            size_hint=(max(0.1, self.no_button.size_hint[0] - 0.1), 
+                      max(0.1, self.no_button.size_hint[1] - 0.1)),
             duration=0.3
         )
         anim.start(self.no_button)
         
-        # Change No button text if visible
-        if self.no_button.size_hint[0] > 0.1:
-            playful_texts = [
-                "No ", "Try again", "Not today", 
-                "Maybe?", "Click Yes!", "Nope!",
-                "I'm shy", "Later?", "Can't decide",
-                "You wish!", "Not sure", "Think again"
-            ]
-            self.no_button.text = choice(playful_texts)
+        # Change No button text
+        playful_texts = [
+            "No ", "Try again", "Not today", 
+            "Maybe?", "Click Yes!", "Nope!",
+            "I'm shy", "Later?", "Can't decide",
+            "You wish!", "Not sure", "Think again"
+        ]
+        self.no_button.text = choice(playful_texts)
         
         # Check if we should show fullscreen
-        if new_width >= 1.0 or new_height >= 1.0:
-            self.show_fullscreen_love()
+        """if new_width >= 1.0 or new_height >= 1.0:
+            self.show_fullscreen_love()"""
 
 if __name__ == '__main__':
     LoveApp().run()
