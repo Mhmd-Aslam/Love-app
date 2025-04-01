@@ -68,9 +68,9 @@ class LoveApp(App):
     # These values determine how much each edge expands relative to others
     expand_factors = {
         'left': 0.2,    # 20% of growth goes to left
-        'right': 0.5,   # 50% of growth goes to right
-        'top': 5,       # 50% of growth goes to top
-        'bottom': 1     # 10% of growth goes to bottom
+        'right': 0.2,   # 50% of growth goes to right
+        'top': 12.5,       # 50% of growth goes to top
+        'bottom': 12     # 10% of growth goes to bottom
     }
     
     def build(self):
