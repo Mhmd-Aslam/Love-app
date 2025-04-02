@@ -140,6 +140,20 @@ class LoveApp(App):
         return self.layout
     
     def show_fullscreen_love(self):
+
+
+        # Create a container for the fullscreen content
+        fullscreen_container = FloatLayout()
+        
+        # Add romantic image (replace 'romantic_image.png' with your image path)
+        romantic_image = Image(
+            source='logos/heart2.png',  # Your PNG file path
+            size_hint=(0.8, 0.8),
+            pos_hint={'center_x': 0.5, 'center_y': 0.6},
+            allow_stretch=True,
+            keep_ratio=True
+        )
+        fullscreen_container.add_widget(romantic_image)
         # Create fullscreen love message
         self.love_button = RoundedButton(
             text="I LOVE YOU! ",
@@ -150,6 +164,8 @@ class LoveApp(App):
             pos_hint={'x': 0, 'y': 0},
             bold=True)
         self.love_button.border_radius = [0]
+
+        
         
         self.layout.clear_widgets()
         self.layout.add_widget(self.love_button)
