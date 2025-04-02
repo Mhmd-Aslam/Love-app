@@ -10,6 +10,8 @@ from kivy.graphics import Color, RoundedRectangle
 from random import choice
 from kivy.clock import Clock
 from kivy.metrics import dp
+from kivy.storage.jsonstore import JsonStore
+import os
 
 class RoundedButton(Button):
     """Button with rounded corners and visible colors"""
@@ -45,9 +47,31 @@ class RoundedButton(Button):
 class LoveApp(App):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.title = "Love App"  # App name
-        self.icon = 'logos/main.png'  # App icon path
+        self.title = "Love App"
+        self.icon = 'logos/main.png'
+        self.clear_app_data()  # Clear data on each launch
     
+    def clear_app_data(self):
+        """Clear all stored data when app starts"""
+        try:
+            # Clear Kivy storage
+            store = JsonStore('loveapp.json')
+            store.clear()
+            
+            # Clear cache directory
+            cache_dir = self.user_data_dir
+            for filename in os.listdir(cache_dir):
+                file_path = os.path.join(cache_dir, filename)
+                try:
+                    if os.path.isfile(file_path) or os.path.islink(file_path):
+                        os.unlink(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                except Exception as e:
+                    print(f'Failed to delete {file_path}. Reason: {e}')
+        except Exception as e:
+            print(f"Error clearing data: {e}")
+
     message = StringProperty("Will you go on a date with me?")
     original_yes_size = (0.43, 0.6)
     original_yes_pos = {'center_x': 0.27, 'center_y': 0.5}
@@ -62,6 +86,11 @@ class LoveApp(App):
     
     def build(self):
         Window.clearcolor = (0.98, 0.85, 0.9, 1)
+        self.setup_ui()
+        return self.layout
+    
+    def setup_ui(self):
+        """Initialize all UI elements fresh each time"""
         self.layout = FloatLayout()
         
         # Content
@@ -114,8 +143,6 @@ class LoveApp(App):
         self.button_box.add_widget(self.no_button)
         self.layout.add_widget(self.content)
         self.layout.add_widget(self.button_box)
-        
-        return self.layout
     
     def show_fullscreen_love(self):
         self.love_button = RoundedButton(
