@@ -9,9 +9,7 @@ from kivy.properties import StringProperty, ListProperty, NumericProperty
 from kivy.graphics import Color, RoundedRectangle
 from random import choice
 from kivy.clock import Clock
-
-# Set mobile-friendly dimensions
-Window.size = (360, 640)  # Standard mobile size
+from kivy.metrics import dp
 
 class RoundedButton(Button):
     """Button with rounded corners and visible colors"""
@@ -94,7 +92,7 @@ class LoveApp(App):
         # Romantic message - adjusted to fit screen
         self.label = Label(
             text=self.message,
-            font_size="24sp",
+            font_size=dp(24),
             bold=True,
             color=(0.8, 0.2, 0.4, 1),
             outline_color=(1, 1, 1, 0.8),
@@ -113,7 +111,7 @@ class LoveApp(App):
         # "Yes" Button
         self.yes_button = RoundedButton(
             text="Yes!",
-            font_size="24sp",
+            font_size=dp(24),
             button_color=(0.9, 0.3, 0.5, 1),
             color=(1, 1, 1, 1),
             size_hint=self.original_yes_size,
@@ -125,7 +123,7 @@ class LoveApp(App):
         # "No" Button
         self.no_button = RoundedButton(
             text="No",
-            font_size="24sp",
+            font_size=dp(24),
             button_color=(0.7, 0.5, 0.7, 1),
             color=(1, 1, 1, 1),
             size_hint=(0.43, 0.6),
@@ -140,24 +138,23 @@ class LoveApp(App):
         return self.layout
     
     def show_fullscreen_love(self):
-
-
         # Create a container for the fullscreen content
         fullscreen_container = FloatLayout()
         
         # Add romantic image (replace 'romantic_image.png' with your image path)
         romantic_image = Image(
-            source='logos/heart2.png',  # Your PNG file path
+            source='logos/heart2.png',
             size_hint=(0.8, 0.8),
             pos_hint={'center_x': 0.5, 'center_y': 0.6},
             allow_stretch=True,
             keep_ratio=True
         )
         fullscreen_container.add_widget(romantic_image)
+        
         # Create fullscreen love message
         self.love_button = RoundedButton(
             text="I LOVE YOU! ",
-            font_size=48,
+            font_size=dp(48),
             button_color=(1, 0.2, 0.4, 1),
             color=(1, 1, 1, 1),
             size_hint=(1, 1),
@@ -165,13 +162,11 @@ class LoveApp(App):
             bold=True)
         self.love_button.border_radius = [0]
 
-        
-        
         self.layout.clear_widgets()
         self.layout.add_widget(self.love_button)
         
-        anim = (Animation(font_size=52, duration=0.8) + 
-               Animation(font_size=48, duration=0.8))
+        anim = (Animation(font_size=dp(52), duration=0.8) + 
+               Animation(font_size=dp(48), duration=0.8))
         anim.repeat = True
         anim.start(self.love_button)
     
