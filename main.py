@@ -13,7 +13,7 @@ from kivy.metrics import dp
 from kivy.storage.jsonstore import JsonStore
 import os
 import shutil
-
+from kivy.base import EventLoop
 
 class RoundedButton(Button):
     """Button with rounded corners and visible colors"""
@@ -51,10 +51,30 @@ class LoveApp(App):
         super().__init__(**kwargs)
         self.title = "Love App"
         self.icon = 'logos/heart.png'
-        self.clear_app_data()  # Clear data on each launch
+        self._keyboard = None
     
+    def on_start(self):
+        """Bind keyboard events when app starts"""
+        self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
+        self._keyboard.bind(on_key_down=self._on_keyboard_down)
+        self.clear_app_data()  # Clear data on initial launch
+    
+    def _keyboard_closed(self):
+        """Handle keyboard being closed"""
+        self._keyboard.unbind(on_key_down=self._on_keyboard_down)
+        self._keyboard = None
+    
+    def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
+        """Handle back button press on Android"""
+        if keycode[1] == 'escape':  # Back button
+            self.clear_app_data()
+            App.get_running_app().stop()
+            EventLoop.close()
+            return True
+        return False
+
     def clear_app_data(self):
-        """Clear all stored data when app starts"""
+        """Clear all stored data"""
         try:
             # Clear Kivy storage
             store = JsonStore('loveapp.json')
@@ -166,7 +186,7 @@ class LoveApp(App):
         watermark = Label(
             text="developed by Mhmd-Aslam",
             font_size=dp(12),
-            color=(0.5, 0.5, 0.5, 0.7),  # Semi-transparent gray
+            color=(0.5, 0.5, 0.5, 0.7),
             size_hint=(None, None),
             size=(Window.width, dp(20)),
             pos_hint={'center_x': 0.5, 'y': 0.01},
@@ -176,7 +196,6 @@ class LoveApp(App):
         self.layout.clear_widgets()
         self.layout.add_widget(container)
         
-        # Animation remains the same
         anim = (Animation(font_size=dp(52), duration=0.8) + 
                Animation(font_size=dp(48), duration=0.8))
         anim.repeat = True
