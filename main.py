@@ -147,6 +147,10 @@ class LoveApp(App):
         self.layout.add_widget(self.button_box)
     
     def show_fullscreen_love(self):
+        # Create container for the fullscreen content
+        container = FloatLayout()
+        
+        # Main love button
         self.love_button = RoundedButton(
             text="I LOVE YOU!",
             font_size=dp(48),
@@ -156,10 +160,23 @@ class LoveApp(App):
             pos_hint={'x': 0, 'y': 0},
             bold=True)
         self.love_button.border_radius = [0]
+        container.add_widget(self.love_button)
+        
+        # Add watermark label
+        watermark = Label(
+            text="developed by Mhmd-Aslam",
+            font_size=dp(12),
+            color=(0.5, 0.5, 0.5, 0.7),  # Semi-transparent gray
+            size_hint=(None, None),
+            size=(Window.width, dp(20)),
+            pos_hint={'center_x': 0.5, 'y': 0.01},
+            halign='center')
+        container.add_widget(watermark)
         
         self.layout.clear_widgets()
-        self.layout.add_widget(self.love_button)
+        self.layout.add_widget(container)
         
+        # Animation remains the same
         anim = (Animation(font_size=dp(52), duration=0.8) + 
                Animation(font_size=dp(48), duration=0.8))
         anim.repeat = True
