@@ -6,12 +6,13 @@ A romantic interactive proposal app built with Python and Kivy that playfully as
 - Animated interface with heart graphics
 - "Yes" button grows, "No" button moves playfully
 - Fullscreen "I LOVE YOU" reveal
-- Mobile-responsive design (360x640)
+- Mobile-responsive design that adapts to screen sizes
 - Custom rounded buttons with proportional text scaling
 
 ## Requirements 📋
 - Python 3.7+
 - Kivy 2.0.0+
+- Buildozer (for Android APK)
 
 ## Installation 🛠️
 ```bash
@@ -25,7 +26,7 @@ pip install kivy
 python main.py
 ```
 - "Yes!" reveals a fullscreen love declaration
-- "No" button shrinks, moves, and disappears after 7 clicks
+- "No" button shrinks, moves, and disappears after  clicks
 
 ## Customization 🎨
 Modify colors, messages, button behaviors, and images in the `logos` folder.
@@ -36,6 +37,7 @@ love-proposal-app/
 ├── main.py  # Main code
 ├── README.md  # This file
 ├── logos/  # Image assets
+├──bin/ apk file
 ```
 
 ## Contributing 🤝
