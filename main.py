@@ -12,6 +12,8 @@ from kivy.clock import Clock
 from kivy.metrics import dp
 from kivy.storage.jsonstore import JsonStore
 import os
+import shutil
+
 
 class RoundedButton(Button):
     """Button with rounded corners and visible colors"""
@@ -48,7 +50,7 @@ class LoveApp(App):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.title = "Love App"
-        self.icon = 'logos/main.png'
+        self.icon = 'logos/heart.png'
         self.clear_app_data()  # Clear data on each launch
     
     def clear_app_data(self):
