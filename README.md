@@ -42,7 +42,7 @@ love-proposal-app/
 ├── main.py  # Main code
 ├── README.md  # This file
 ├── logos/  # Image assets
-├──bin/ Love-App.apk # APK file ready to install
+├──bin/loveapp-2.0-arm64.apk # APK file ready to install
 ```
 
 ## Contributing 🤝
