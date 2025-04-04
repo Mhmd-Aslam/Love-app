@@ -91,7 +91,7 @@ class LoveApp(App):
         self.heart = Image(
             source="logos/heart.png",
             size_hint=(0.4, 0.4),
-            pos_hint={'center_x': 0.5, 'center_y': 0.7},
+            pos_hint={'center_x': 0.5, 'center_y': 1},
             allow_stretch=True)
         self.content.add_widget(self.heart)
         
@@ -105,7 +105,7 @@ class LoveApp(App):
             outline_width=2,
             size_hint=(0.9, None),
             height=dp(100),
-            pos_hint={'center_x': 0.5, 'top': 0.55},
+            pos_hint={'center_x': 0.5, 'top': 0.85},
             halign='center',
             valign='middle',
             text_size=(Window.width * 0.85, None))
