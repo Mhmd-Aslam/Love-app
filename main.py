@@ -6,15 +6,31 @@ from kivy.uix.image import Image
 from kivy.core.window import Window
 from kivy.animation import Animation
 from kivy.properties import StringProperty, ListProperty, NumericProperty
-from kivy.graphics import Color, RoundedRectangle, Rectangle
+from kivy.graphics import Color, RoundedRectangle
 from random import choice
 from kivy.clock import Clock
 from kivy.metrics import dp
 from kivy.config import Config
+from kivy.storage.jsonstore import JsonStore
+import os
+import shutil
 
 # Configure window settings
 Config.set('graphics', 'resizable', '0')
 Config.set('kivy', 'exit_on_escape', '0')
+
+# Android compatibility setup
+ANDROID = False
+try:
+    from android.runnable import run_on_ui_thread
+    from jnius import autoclass
+    PythonActivity = autoclass('org.kivy.android.PythonActivity')
+    Intent = autoclass('android.content.Intent')
+    ANDROID = True
+except ImportError:
+    print("Running on desktop - Android modules not available")
+    # Create dummy decorator for non-Android platforms
+    run_on_ui_thread = lambda func: func
 
 class RoundedButton(Button):
     """Button with properly rounded corners"""
@@ -70,9 +86,52 @@ class LoveApp(App):
         self.icon = 'logos/heart.png'
         Window.bind(on_keyboard=self.on_keyboard)
     
+    def clear_app_data(self):
+        """Clear all stored app data"""
+        try:
+            # Clear Kivy storage
+            store = JsonStore('loveapp.json')
+            store.clear()
+            
+            # Clear cache directory (only on Android)
+            if ANDROID:
+                cache_dir = self.user_data_dir
+                if os.path.exists(cache_dir):
+                    for filename in os.listdir(cache_dir):
+                        file_path = os.path.join(cache_dir, filename)
+                        try:
+                            if os.path.isfile(file_path) or os.path.islink(file_path):
+                                os.unlink(file_path)
+                            elif os.path.isdir(file_path):
+                                shutil.rmtree(file_path)
+                        except Exception as e:
+                            print(f'Failed to delete {file_path}. Reason: {e}')
+        except Exception as e:
+            print(f"Error clearing data: {e}")
+
+    @run_on_ui_thread
+    def android_clean_exit(self):
+        """Properly exit the app on Android"""
+        if not ANDROID:
+            print("Running on desktop - cannot perform Android exit")
+            return
+        
+        activity = PythonActivity.mActivity
+        intent = Intent(activity, PythonActivity)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        activity.startActivity(intent)
+        activity.finishAndRemoveTask()
+        os._exit(0)
+
     def on_keyboard(self, window, key, *args):
-        if key == 27:  # Android back button
-            return True  # Prevent closing
+        if key == 27:  # Android back button or ESC on desktop
+            self.clear_app_data()
+            if ANDROID:
+                self.android_clean_exit()
+            else:
+                # Fallback for desktop testing
+                App.get_running_app().stop()
+            return True  # Consume the event
         return False
     
     def build(self):
