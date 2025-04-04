@@ -2,6 +2,11 @@
 
 A romantic interactive proposal android app built with Python and Kivy that playfully asks someone on a date, featuring animated buttons and a fullscreen love declaration.
 
+## 📲 Download APK
+
+👉 [Click here to download the APK](https://github.com/Mhmd-Aslam/Love-app/raw/main/bin/loveapp-2.0-arm64.apk)
+
+
 ## Features ✨
 - Animated interface with heart graphics
 - "Yes" button grows, "No" button moves playfully
