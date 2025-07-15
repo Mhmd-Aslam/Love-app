@@ -36,17 +36,19 @@ python main.py
 ## Customization 🎨
 Modify colors, messages, button behaviors, and images in the `logos` folder.
 
-## File Structure 📂
-```
-love-proposal-app/
-├── main.py  # Main code
-├── README.md  # This file
-├── logos/  # Image assets
-├──bin/loveapp-2.0-arm64.apk # APK file ready to install
-```
 
 ## Contributing 🤝
 Open an issue or submit a pull request for improvements.
+
+## 📷 Screenshots
+
+<p align="left">
+  <img src="./assets/Ss01.jpg"  width="30%" style="margin-right: 50px;"/>
+  <img src="./assets/Ss02.jpg"  width="30%" style="margin-right: 50px;"/>
+  <img src="./assets/Ss03.jpg"  width="30%" style="margin-right: 50px;"/>
+  <img src="./assets/Ss04.jpg"  width="30%" style="margin-right: 50px;"/>
+  <img src="./assets/Ss05.jpg"  width="30%"/>
+</p>
 
 ## License 📄
 Licensed under the MIT License.
