@@ -43,11 +43,11 @@ Open an issue or submit a pull request for improvements.
 ## 📷 Screenshots
 
 <p align="left">
-  <img src="./assets/Ss01.jpg"  width="30%" style="margin-right: 50px;"/>
-  <img src="./assets/Ss02.jpg"  width="30%" style="margin-right: 50px;"/>
-  <img src="./assets/Ss03.jpg"  width="30%" style="margin-right: 50px;"/>
-  <img src="./assets/Ss04.jpg"  width="30%" style="margin-right: 50px;"/>
-  <img src="./assets/Ss05.jpg"  width="30%"/>
+  <img src="./assets/Ss01.jpg"  width="25%" style="margin-right: 50px;"/>
+  <img src="./assets/Ss02.jpg"  width="25%" style="margin-right: 50px;"/>
+  <img src="./assets/Ss03.jpg"  width="25%" style="margin-right: 50px;"/>
+  <img src="./assets/Ss04.jpg"  width="25%" style="margin-right: 50px;"/>
+  <img src="./assets/Ss05.jpg"  width="25%"/>
 </p>
 
 ## License 📄
